@@ -1,0 +1,10 @@
+{
+  "name": "mthere",
+  "version": "0.0.1",
+  "description": "Event Creation and RSVP App",
+  "author": "Bobby Watson and Brian Kronengold",
+  "license": "MIT",
+  "dependencies": {
+    "serverless-python-requirements": "^4.1.0"
+  }
+}

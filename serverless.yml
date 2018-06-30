@@ -1,0 +1,100 @@
+service: mthere
+
+frameworkVersion: ">=1.2.0 <2.0.0"
+
+package:
+  exclude:
+    - .idea/**
+    - node_modules/**
+    - README.md
+    - package.json
+    - package-lock.json
+    - requirements.txt
+    - .idea/**
+    - .requirements/**
+    - env/**
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: non-linux
+
+provider:
+  name: aws
+  runtime: python3.6
+  profile: mthere
+  environment:
+    DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:DescribeTable
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+
+functions:
+  users_create:
+    handler: mthere/users/create.create
+    events:
+      - http:
+          path: mthere/users
+          method: post
+          cors: true
+
+  users_get:
+    handler: mthere/users/get.get
+    events:
+      - http:
+          path: mthere/users/{id}
+          method: get
+          cors: true
+
+  users_list:
+    handler: mthere/users/list.list
+    events:
+      - http:
+          path: mthere/users
+          method: get
+          cors: true
+
+  users_update:
+    handler: mthere/users/update.update
+    events:
+      - http:
+          path: mthere/users/{id}
+          method: put
+          cors: true
+
+  users_delete:
+    handler: mthere/users/delete.delete
+    events:
+      - http:
+          path: mthere/users/{id}
+          method: delete
+          cors: true
+
+resources:
+  Resources:
+    UsersDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: user_id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: user_id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
