@@ -5,8 +5,9 @@ from mthere.models import User
 
 
 def delete(event, context):
+    user_id = event['pathParameters']['id']
     try:
-        found_user = User.get(hash_key=event['user_id'])
+        found_user = User.get(hash_key=user_id)
     except DoesNotExist:
         return {'statusCode': 404,
                 'body': json.dumps({'error_message': 'User was not found'})}

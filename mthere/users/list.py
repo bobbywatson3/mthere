@@ -9,4 +9,4 @@ def list(event, context):
 
     # create a response
     return {'statusCode': 200,
-            'body': json.dumps({'items': [dict(result) for result in results]})}
+            'body': json.dumps({'items': [result.to_dict() for result in results]}, default=str)}

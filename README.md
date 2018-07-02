@@ -26,7 +26,39 @@ serverless deploy
 The expected result should be similar to:
 
 ```bash
-fill this in
+Serverless: Installing requirements of requirements.txt in .serverless...
+Serverless: Docker Image: lambci/lambda:build-python3.6
+Serverless: Packaging service...
+Serverless: Excluding development dependencies...
+Serverless: Injecting required Python packages to package...
+Serverless: Uploading CloudFormation file to S3...
+Serverless: Uploading artifacts...
+Serverless: Uploading service .zip file to S3 (509.22 KB)...
+Serverless: Validating template...
+Serverless: Updating Stack...
+Serverless: Checking Stack update progress...
+......................................
+Serverless: Stack update finished...
+Service Information
+service: mthere
+stage: dev
+region: us-east-1
+stack: mthere-dev
+api keys:
+  None
+endpoints:
+  POST - https://XXXXXX.execute-api.us-east-1.amazonaws.com/dev/mthere/users
+  GET - https://XXXXXX.execute-api.us-east-1.amazonaws.com/dev/mthere/users/{id}
+  GET - https://XXXXXX.execute-api.us-east-1.amazonaws.com/dev/mthere/users
+  PUT - https://XXXXXX.execute-api.us-east-1.amazonaws.com/dev/mthere/users/{id}
+  DELETE - https://XXXXXX.execute-api.us-east-1.amazonaws.com/dev/mthere/users/{id}
+functions:
+  users_create: mthere-dev-users_create
+  users_get: mthere-dev-users_get
+  users_list: mthere-dev-users_list
+  users_update: mthere-dev-users_update
+  users_delete: mthere-dev-users_delete
+Serverless: Removing old service versions...
 ```
 
 ## Usage
@@ -36,52 +68,57 @@ You can create, retrieve, update, or delete users or events with the following c
 ### Create a User
 
 ```bash
-curl -X POST https://XXXXXXX.execute-api.us-east-1.amazonaws.com/dev/users --data '{ "name": "Ash Williams", "email": "ash@smart.com", "password": "Linda" }'
-```
-
-No output
-
-### List All Users
-
-```bash
-curl https://XXXXXXX.execute-api.us-east-1.amazonaws.com/dev/users
+curl -H "Content-Type: application/json" -X POST https://XXXXXXX.execute-api.us-east-1.amazonaws.com/dev/mthere/users -d '{"user_id": "1233446783245", "email": "ash@smart.com"}'
 ```
 
 Example output:
 ```bash
-[{"email":"ash@smart.com","id":"ac90fe80-aa83-11e6-9ede-afdfa051af86","events":["520AD8EA-4C5D-4775-AC84-CAEDADB837F0","114143C7-0221-48F0-A292-D50BB7E403EE"]updatedAt":1479139961304},
-[{"email":"sam@smart.com","id":"A6B3DC89-A96C-48B1-A7E7-1F377FB0932F","events":["520AD8EA-4C5D-4775-AC84-CAEDADB837F0","DBE9B32E-7146-466E-90BB-27D508A998EE"]updatedAt":1479139961304}]%
+{"created_at": "2018-07-02 14:48:21.527201", "user_id": "1233446783245", "email": "ash@smart.com", "updated_at": "2018-07-02 14:48:21.527352"}
+```
+
+### List All Users
+
+```bash
+curl https://XXXXXX.execute-api.us-east-1.amazonaws.com/dev/mthere/users
+```
+
+Example output:
+```bash
+{"items": [
+{"created_at": "2018-06-30 21:46:14.291413+00:00", "updated_at": "2018-06-30 21:46:14.291743+00:00", "email": "test@test.com", "user_id": "02cd0b78-7caf-11e8-9845-d25b2faa1595"}, 
+{"created_at": "2018-07-02 14:48:21.527201+00:00", "updated_at": "2018-07-02 14:48:21.527352+00:00", "email": "ash@smart.com", "user_id": "f71858ec-7e06-11e8-9073-c2523bb10998"}, 
+]}
 ```
 
 ### Get One User
 
 ```bash
-# Replace the <id> part with a real id from your todos table
-curl https://XXXXXXX.execute-api.us-east-1.amazonaws.com/dev/users/<id>
+# Replace the <id> part with a real id from your users table
+curl https://XXXXXXX.execute-api.us-east-1.amazonaws.com/dev/mthere/users/<id>
 ```
 
 Example Result:
 ```bash
-{"email":"sam@smart.com","id":"A6B3DC89-A96C-48B1-A7E7-1F377FB0932F","events":["520AD8EA-4C5D-4775-AC84-CAEDADB837F0","DBE9B32E-7146-466E-90BB-27D508A998EE"]updatedAt":1479139961304}%
+{"created_at": "2018-07-02 12:30:51.714929+00:00", "updated_at": "2018-07-02 12:30:51.715280+00:00", "email": "test@test.com", "user_id": "c1d2e35e-7df3-11e8-8b04-ce3128b47469"}
 ```
 
 ### Update a User
 
 ```bash
 # Replace the <id> part with a real id from your Users table
-curl -X PUT https://XXXXXXX.execute-api.us-east-1.amazonaws.com/dev/users/<id> --data '{ "email": "ash@smart.com" }'
+curl -H "Content-Type: application/json" -X PUT -d '{"email": "newemail@email.com"}' https://XXXXXXX.execute-api.us-east-1.amazonaws.com/users/<id>
 ```
 
 Example Result:
 ```bash
-{"text":"Learn Serverless","id":"ee6490d0-aa81-11e6-9ede-afdfa051af86","createdAt":1479138570824,"checked":true,"updatedAt":1479138570824}%
+{"created_at": "2018-07-02 12:30:51.714929+00:00", "updated_at": "2018-07-02 14:56:19.095179", "email": "newemail@email.com", "user_id": "c1d2e35e-7df3-11e8-8b04-ce3128b47469"}
 ```
 
-### Delete a Todo
+### Delete a User
 
 ```bash
-# Replace the <id> part with a real id from your todos table
-curl -X DELETE https://XXXXXXX.execute-api.us-east-1.amazonaws.com/dev/todos/<id>
+# Replace the <id> part with a real id from your users table
+curl -X DELETE https://XXXXXXX.execute-api.us-east-1.amazonaws.com/dev/mthere/users/<id>
 ```
 
 No output

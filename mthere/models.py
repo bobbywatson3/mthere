@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-from pynamodb.attributes import ListAttribute, UnicodeAttribute, BooleanAttribute, UTCDateTimeAttribute
+from pynamodb.attributes import ListAttribute, UnicodeAttribute, UTCDateTimeAttribute
 from pynamodb.models import Model
 
 
@@ -31,6 +31,12 @@ class User(Model):
         self.updated_at = datetime.now()
         super(User, self).save()
 
-    def __iter__(self):
-        for name, attr in self._get_attributes().items():
-            yield name, attr.serialize(getattr(self, name))
+    def to_dict(self):
+        """
+        Converts user object to a dictionary for easy JSON serialization.
+        :return: User object as a dictionary
+        """
+        d = {}
+        for key in self.attribute_values:
+            d[key] = self.__getattribute__(key)
+        return d
